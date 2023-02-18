@@ -8,8 +8,7 @@ void main() {
     ..addComponent(const Name('washing the dishes'))
     ..addComponent(const Duration(1000))
     ..addComponent(const Owner(Name('Frank')))
-    ..addComponent(const Location(Name('kitchen')))
-    ..addComponent(const Duration(1000));
+    ..addComponent(const Location(Name('kitchen')));
 
   context.world.spawn()
     ..addComponent(const Name('emptying the trash'))
@@ -31,17 +30,6 @@ void main() {
   print('Query<(Name, Duration, Location)>: ');
   for (final result in query2.exec()) {
     print(' could anyone please take care of "${result.record.$1}" in the ${result.record.$3}, it should not take more than ${result.record.$2} seconds');
-  }
-}
-
-Type typeOf<X>() => X;
-
-class Test1<T> {
-  final Record record;
-
-  Test1(this.record) {
-    print(record is T);
-    print(identical(typeOf<(int, int)>(), typeOf<T>()));
   }
 }
 
