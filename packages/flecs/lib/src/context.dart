@@ -3,5 +3,7 @@ import 'package:flecs/src/world.dart';
 class Context {
   final World world;
 
-  Context() : world = World();
+  Context()
+      : world = World(Stream.periodic(const Duration(milliseconds: 60))
+            .asBroadcastStream());
 }

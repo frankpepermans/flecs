@@ -1,10 +1,24 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
+import 'package:quiver/core.dart';
 
 class World {
   final Set<Type> _componentTypes = <Type>{};
   final List<Entity> _entities = <Entity>[];
+  final List<StreamSubscription> _systemsListeners = <StreamSubscription>[];
+  final Stream scheduler;
 
-  World();
+  World(this.scheduler);
+
+  void dispose() {
+    for (final it in _systemsListeners) {
+      it.cancel();
+    }
+  }
+
+  int get entitiesHashCode =>
+      hashObjects(_entities.map((it) => it.componentsHashCode));
 
   Entity spawn() {
     return Entity._(this);
@@ -14,12 +28,31 @@ class World {
         componentTypes: Set.unmodifiable(_componentTypes),
         entities: List.unmodifiable(_entities),
       );
+
+  void addSystem<T extends Record>(
+    T system, {
+    required FutureOr Function(T) handler,
+  }) {
+    var hc = -1;
+
+    _systemsListeners.add(scheduler.listen((_) {
+      final hcNow = entitiesHashCode;
+
+      if (hc != hcNow) {
+        hc = hcNow;
+
+        handler(system);
+      }
+    }));
+  }
 }
 
 class Entity {
   final World _world;
   final List<Object> components;
   late final int _index;
+
+  int get componentsHashCode => hashObjects(components);
 
   Entity._(this._world) : components = const [] {
     _index = _world._entities.length;
