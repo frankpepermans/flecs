@@ -14,23 +14,26 @@ class Query<T extends Record> {
   List<QueryRecord<T>> exec() {
     final querySession = context.world.createQuerySession();
     final data = querySession.componentTypes.toList(growable: false);
-    final indices = _resolvedTypes.putIfAbsent(
-        T,
-        () =>
-            _combineAll((it, data) =>
-                    data.where((i) => i != it).map((i) => [it, i]))
-                .map(
-                  (level) => data
-                      .map((it) => level(it, data))
-                      .expand((it) => it)
-                      .firstWhereOrNull(_test(querySession)),
-                )
-                .take(data.length)
-                .firstWhereOrNull((it) => it != null) ??
-            const []);
+    final test = _test(querySession);
+    final collect = _collect(querySession);
 
-    return List.unmodifiable(_collect(querySession)(indices)
-        .map((it) => QueryRecord._(it.$1, it.$2)));
+    combineAll() =>
+        _combineAll(
+                (it, data) => data.where((i) => i != it).map((i) => [it, i]))
+            .map(
+              (level) => data
+                  .map((it) => level(it, data))
+                  .expand((it) => it)
+                  .firstWhereOrNull(test),
+            )
+            .take(data.length)
+            .firstWhereOrNull((it) => it != null) ??
+        const [];
+
+    final indices = _resolvedTypes.putIfAbsent(
+        T, () => data.map((it) => [it]).firstWhere(test, orElse: combineAll));
+
+    return List.unmodifiable(collect(indices).map(QueryRecord._));
   }
 
   bool Function(List<Type>) _test(WorldQuerySession querySession) =>
@@ -56,7 +59,7 @@ class Query<T extends Record> {
   }
 
   Iterable<(Entity, T)> Function(List<Type>) _collect(WorldQuerySession querySession) =>
-      (List<Type> types) sync* {
+          (List<Type> types) sync* {
         for (final it in querySession.entities) {
           final components = it.componentsFromTypes(types);
 
@@ -77,14 +80,14 @@ class Query<T extends Record> {
             }
           }
         }
-  };
+      };
 }
 
 class QueryRecord<T extends Record> {
   final Entity entity;
   final T record;
 
-  const QueryRecord._(this.entity, this.record);
+  QueryRecord._((Entity, T) record) : entity = record.$1, record = record.$2;
 }
 
 extension _ListExtension<T> on List<T> {

@@ -18,7 +18,7 @@ void main() {
 
   final query1 = Query<(Duration, Name, Location, Owner)>(context);
   final query2 = Query<(Name, Duration, Location)>(context);
-  final query3 = Query<(Location, Owner)>(context);
+  final query3 = Query<(Location,)>(context);
 
   print('Query<(Duration, Name, Location, Owner)>: ');
   for (final result in query1.exec()) {
@@ -34,7 +34,7 @@ void main() {
     print(' could anyone please take care of "${result.record.$1}" in the ${result.record.$3}, it should not take more than ${result.record.$2} seconds');
   }
 
-  print('Query<(Location, Owner)>: ');
+  print('Query<(Location,)>: ');
   for (final result in query3.exec()) {
     print(' loc! "${result.record.$1}"');
   }
