@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flecs/src/events.dart';
+import 'package:flecs/src/system.dart';
 import 'package:quiver/core.dart';
 
 enum SchedulerPhase { start, end }
@@ -10,6 +11,7 @@ class World {
   final Set<Type> _componentTypes = <Type>{};
   final List<Entity> _entities = <Entity>[];
   final List<Event> _events = <Event>[];
+  final List<Object> _resources = <Object>[];
   List<Event> _currentEventBatch = const [];
   late final StreamSubscription<SchedulerPhase> _schedulerEndListener;
   final List<StreamSubscription<SchedulerPhase>> _systemsListeners =
@@ -42,9 +44,17 @@ class World {
   int get entitiesHashCode =>
       hashObjects(_entities.map((it) => it.componentsHashCode));
 
-  Entity spawn() {
-    return Entity._(this);
+  void addResource<T extends Object>(T resource) => _resources.add(resource);
+
+  T fetchResource<T extends Object>() {
+    try {
+      return _resources.whereType<T>().first;
+    } on StateError {
+      throw ResourceNotFoundError<T>();
+    }
   }
+
+  Entity spawn() => Entity._(this);
 
   Iterable<T> createEventSession<T extends Event>() =>
       List.unmodifiable(_currentEventBatch.whereType<T>());
@@ -54,19 +64,16 @@ class World {
         entities: List.unmodifiable(_entities),
       );
 
-  void addSystem<T extends Record>(
-    T system, {
-    required FutureOr Function(T) handler,
-  }) {
+  void addSystem<T extends Record>(System<T> system) {
     var hc = -1;
 
-    _systemsListeners.add(_schedulerStart.listen((_) {
+    _systemsListeners.add(_schedulerStart.listen((_) async {
       var hcNow = entitiesHashCode;
 
       if (hc != hcNow || _currentEventBatch.isNotEmpty) {
         hc = hcNow;
 
-        handler(system);
+        await system.run();
       }
     }));
   }
@@ -137,4 +144,11 @@ class WorldQuerySession {
     required this.entities,
     required this.componentTypes,
   });
+}
+
+class ResourceNotFoundError<T extends Object> extends Error {
+  ResourceNotFoundError();
+
+  @override
+  String toString() => "Resource not found: $T\nPerhaps you forgot to add the resource?";
 }
