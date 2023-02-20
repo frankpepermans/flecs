@@ -1,5 +1,7 @@
 import 'package:flecs/src/context.dart';
+import 'package:flecs/src/events.dart';
 import 'package:flecs/src/query.dart';
+import 'package:flecs/src/world.dart';
 
 void main() {
   final context = Context();
@@ -17,43 +19,42 @@ void main() {
     .addComponent(const Location(Name('kitchen')));
 
   final query3 = Query<(Location,)>(context);
-  var didAddTask = false;
 
   context.world.addSystem(
       (
-          Query<(Name,)>(context),
-      ),
-      handler: (data) async {
-        await Future.delayed(const Duration(seconds: 3));
+        EventReader<ChangeNameEvent>(context),
+        EventReader<SpawnEntityEvent>(context),
+      )
+      , handler: (data) {
+    for (final event in data.$1.iter()) {
+      event.entity.addComponent(event.nextName);
+    }
 
-        for (final result in data.$1.iter()) {
-          if (result.record.$1.value == 'washing the dishes') {
-            result.entity.replaceComponent(result.record.$1, const Name('mowing the lawn'));
-          }
-        }
-
-        await Future.delayed(const Duration(seconds: 3));
-
-        if (!didAddTask) {
-          didAddTask = true;
-
-          context.world.spawn()
-              .addComponent(const Name('walking the dog'))
-              .addComponent(const TaskDuration(10000))
-              .addComponent(const Owner(Name('Ayden')))
-              .addComponent(const Location(Name('park')));
-        }
-      });
+    for (final _ in data.$2.iter()) {
+      context.world.spawn()
+          .addComponent(const Name('walking the dog'))
+          .addComponent(const TaskDuration(10000))
+          .addComponent(const Owner(Name('Ayden')))
+          .addComponent(const Location(Name('park')));
+    }
+  });
 
   context.world.addSystem(
       (
         Query<(TaskDuration, Name, Location, Owner)>(context),
-        Query<(Name, TaskDuration, Location)>(context)
+        Query<(Name, TaskDuration, Location)>(context),
+        EventWriter<ChangeNameEvent>(context),
+        EventWriter<SpawnEntityEvent>(context),
       ),
       handler: (data) {
         print('Query<(TaskDuration, Name, Location, Owner)>: ');
         for (final result in data.$1.iter()) {
           print(' hi ${result.record.$4}, please take care of "${result.record.$2}" in the ${result.record.$3}, it should not take more than ${result.record.$1} seconds');
+
+          if (result.record.$2.value == 'washing the dishes') {
+            data.$3.send(ChangeNameEvent(result.entity, prevName: result.record.$2, nextName: const Name('mowing the lawn')));
+            data.$4.send(SpawnEntityEvent(result.entity));
+          }
         }
 
         /*for (final result in data.$1.iter()) {
@@ -112,4 +113,14 @@ class Location {
 
   @override
   String toString() => name.toString();
+}
+
+class ChangeNameEvent extends Event {
+  final Name prevName, nextName;
+
+  ChangeNameEvent(Entity entity, {required this.prevName, required this.nextName}) : super(entity);
+}
+
+class SpawnEntityEvent extends Event {
+  SpawnEntityEvent(Entity entity) : super(entity);
 }
