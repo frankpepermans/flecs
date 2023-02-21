@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flecs/src/events.dart';
+import 'package:flecs/src/scheduled_list.dart';
 import 'package:flecs/src/system.dart';
 import 'package:quiver/core.dart';
 
@@ -10,9 +11,8 @@ enum SchedulerPhase { start, end }
 class World {
   final Set<Type> _componentTypes = <Type>{};
   final List<Entity> _entities = <Entity>[];
-  final List<Event> _events = <Event>[];
+  final ScheduledList<Event> _events = ScheduledList<Event>();
   final List<Object> _resources = <Object>[];
-  List<Event> _currentEventBatch = const [];
   late final StreamSubscription<SchedulerPhase> _schedulerEndListener;
   final List<StreamSubscription<SchedulerPhase>> _systemsListeners =
       <StreamSubscription<SchedulerPhase>>[];
@@ -27,10 +27,7 @@ class World {
       : _scheduler = scheduler
             .map((_) => [SchedulerPhase.start, SchedulerPhase.end])
             .expand((it) => it) {
-    _schedulerEndListener = _schedulerEnd.listen((_) {
-      _currentEventBatch = List.unmodifiable(_events);
-      _events.clear();
-    });
+    _schedulerEndListener = _schedulerEnd.listen((_) => _events.update());
   }
 
   void dispose() {
@@ -57,7 +54,7 @@ class World {
   Entity spawn() => Entity._(this);
 
   Iterable<T> createEventSession<T extends Event>() =>
-      List.unmodifiable(_currentEventBatch.whereType<T>());
+      List.unmodifiable(_events.snapshot.whereType<T>());
 
   WorldQuerySession createQuerySession() => WorldQuerySession(
         componentTypes: Set.unmodifiable(_componentTypes),
@@ -70,7 +67,7 @@ class World {
     _systemsListeners.add(_schedulerStart.listen((_) async {
       var hcNow = entitiesHashCode;
 
-      if (hc != hcNow || _currentEventBatch.isNotEmpty) {
+      if (hc != hcNow || _events.hasUpdate) {
         hc = hcNow;
 
         await system.run();
@@ -130,8 +127,10 @@ class Entity {
   }
 
   List<Object> componentsFromTypes(List<Type> types) => types
-      .map((type) =>
-          components.firstWhereOrNull((it) => identical(it.runtimeType, type)))
+      .map((type) => identical(runtimeType, type)
+          ? this
+          : components
+              .firstWhereOrNull((it) => identical(it.runtimeType, type)))
       .whereType<Object>()
       .toList(growable: false);
 }
@@ -150,5 +149,6 @@ class ResourceNotFoundError<T extends Object> extends Error {
   ResourceNotFoundError();
 
   @override
-  String toString() => "Resource not found: $T\nPerhaps you forgot to add the resource?";
+  String toString() =>
+      "Resource not found: $T\nPerhaps you forgot to add the resource?";
 }

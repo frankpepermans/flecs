@@ -11,9 +11,9 @@ class Query<T extends Record> {
 
   const Query(this.context);
 
-  Iterable<QueryRecord<T>> iter() {
+  Iterable<T> iter() {
     final querySession = context.world.createQuerySession();
-    final data = querySession.componentTypes.toList(growable: false);
+    final data = [Entity, ...querySession.componentTypes];
     final test = _test(querySession);
 
     combineAll() =>
@@ -37,7 +37,7 @@ class Query<T extends Record> {
       (List<Type> list) {
         //print(list);
         try {
-          return _collect(querySession)(list).firstOrNull?.record is T;
+          return _collect(querySession)(list).firstOrNull is T;
         } catch (_) {
           //
         }
@@ -46,45 +46,40 @@ class Query<T extends Record> {
       };
 
   Iterable<Combiner> _combineAll(Combiner f) sync* {
-    next(Type it, List<Type> data) => f(it, data)
+    yield f;
+    yield* _combineAll((Type it, List<Type> data) => f(it, data)
         .map((tuple) =>
             data.where(tuple.containsNot).map((other) => [...tuple, other]))
-        .expand((it) => it);
-
-    yield f;
-    yield* _combineAll(next);
+        .expand((it) => it));
   }
 
-  Iterable<QueryRecord<T>> Function(List<Type>) _collect(WorldQuerySession querySession) =>
+  Iterable<T> Function(List<Type>) _collect(WorldQuerySession querySession) =>
           (List<Type> types) sync* {
         for (final it in querySession.entities) {
           final components = it.componentsFromTypes(types);
 
           if (components.length == types.length) {
-            switch (components.length) {
-              case 1:
-                yield QueryRecord._(it, (components[0],) as T);
-              case 2:
-                yield QueryRecord._(it, (components[0], components[1]) as T);
-              case 3:
-                yield QueryRecord._(it, (components[0], components[1], components[2]) as T);
-              case 4:
-                yield QueryRecord._(it, (components[0], components[1], components[2], components[3]) as T);
-              case 5:
-                yield QueryRecord._(it, (components[0], components[1], components[2], components[3], components[4]) as T);
-              case 6:
-                yield QueryRecord._(it, (components[0], components[1], components[2], components[3], components[4], components[5]) as T);
+            try {
+              switch (components.length) {
+                case 1:
+                  yield (components[0],) as T;
+                case 2:
+                  yield (components[0], components[1]) as T;
+                case 3:
+                  yield (components[0], components[1], components[2]) as T;
+                case 4:
+                  yield (components[0], components[1], components[2], components[3]) as T;
+                case 5:
+                  yield (components[0], components[1], components[2], components[3], components[4]) as T;
+                case 6:
+                  yield (components[0], components[1], components[2], components[3], components[4], components[5]) as T;
+              }
+            } catch (_) {
+              //
             }
           }
         }
       };
-}
-
-class QueryRecord<T extends Record> {
-  final Entity entity;
-  final T record;
-
-  QueryRecord._(this.entity, this.record);
 }
 
 extension _ListExtension<T> on List<T> {
