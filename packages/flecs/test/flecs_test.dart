@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('A group of tests', () {
-    final awesome = Awesome();
+    /*final awesome = Awesome();
 
     setUp(() {
       // Additional setup goes here.
@@ -11,6 +11,6 @@ void main() {
 
     test('First Test', () {
       expect(awesome.isAwesome, isTrue);
-    });
+    });*/
   });
 }

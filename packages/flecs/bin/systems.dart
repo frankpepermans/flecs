@@ -9,7 +9,7 @@ import 'components.dart';
 import 'events.dart';
 import 'repositories.dart';
 
-updateSystem(Context context) => System.create((
+final updateSystem = (Context context) => System((
     EventReader<ChangeNameEvent>(context),
     EventReader<SpawnEntityEvent>(context),
     Resource<TaskRepository>(context),
@@ -29,7 +29,7 @@ updateSystem(Context context) => System.create((
     }
   });
 
-renderSystem(Context context) => System.create((
+final renderSystem = (Context context) => System((
     Query<(TaskDuration, Name, Location, Owner, Entity)>(context),
     Query<(Name, TaskDuration, Location)>(context),
     EventWriter<ChangeNameEvent>(context),

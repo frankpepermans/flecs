@@ -9,8 +9,8 @@ void main() {
 
   context.world
     ..addResource(const TaskRepository())
-    ..addSystem(updateSystem(context))
-    ..addSystem(renderSystem(context))
+    ..addSystem(updateSystem)
+    ..addSystem(renderSystem)
     ..spawn()
         .addComponent(const Name('emptying the trash'))
         .addComponent(const TaskDuration(1000))

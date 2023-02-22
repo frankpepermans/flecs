@@ -63,16 +63,22 @@ class Query<T extends Record> {
               switch (components.length) {
                 case 1:
                   yield (components[0],) as T;
+                  break;
                 case 2:
                   yield (components[0], components[1]) as T;
+                  break;
                 case 3:
                   yield (components[0], components[1], components[2]) as T;
+                  break;
                 case 4:
                   yield (components[0], components[1], components[2], components[3]) as T;
+                  break;
                 case 5:
                   yield (components[0], components[1], components[2], components[3], components[4]) as T;
+                  break;
                 case 6:
                   yield (components[0], components[1], components[2], components[3], components[4], components[5]) as T;
+                  break;
               }
             } catch (_) {
               //
