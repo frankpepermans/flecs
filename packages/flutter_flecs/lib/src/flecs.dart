@@ -6,6 +6,7 @@ class Flecs extends StatefulWidget {
   final List<Object> resources;
   final List<SystemBuilder<Record>> startupSystems;
   final List<SystemBuilder<Record>> systems;
+  final Context? context;
 
   const Flecs({
     Key? key,
@@ -13,6 +14,7 @@ class Flecs extends StatefulWidget {
     this.resources = const [],
     this.systems = const [],
     this.startupSystems = const [],
+    this.context,
   }) : super(key: key);
 
   @override
@@ -44,7 +46,7 @@ class FlecsState extends State<Flecs> {
   void initState() {
     super.initState();
 
-    flecsContext = Context();
+    flecsContext = widget.context ?? Context();
 
     for (final resource in widget.resources) {
       flecsContext.world.addResource(resource);

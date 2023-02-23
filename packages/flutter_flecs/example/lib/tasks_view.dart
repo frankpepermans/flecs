@@ -7,13 +7,10 @@ class TasksView extends StatelessWidget {
   const TasksView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final flecsContext = Flecs.of(context).flecsContext;
-
-    return QueryBuilder(
+  Widget build(BuildContext context) => QueryBuilder(
         select: (
-          Query<(int, Entity)>(flecsContext),
-          EventWriter<IntUpdater>(flecsContext),
+          Query<(int, Entity)>(context.flecs),
+          EventWriter<IntUpdater>(context.flecs),
         ),
         builder: (data) {
           final query = data.$1;
@@ -42,5 +39,4 @@ class TasksView extends StatelessWidget {
             itemCount: iter.length,
           ),);
         });
-  }
 }

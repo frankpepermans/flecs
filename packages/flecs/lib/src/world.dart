@@ -35,6 +35,9 @@ class World {
       it.subscription.cancel();
     }
 
+    _entities.clear();
+    _componentTypes.clear();
+    _resources.clear();
     _runners.clear();
   }
 
@@ -105,17 +108,18 @@ class World {
 class Entity {
   final World _world;
   final List<Object> components;
-  late final int _index;
 
   int get componentsHashCode => hashObjects(components);
 
   Entity._(this._world) : components = const [] {
-    _index = _world._entities.length;
-
     _world._entities.add(this);
   }
 
-  Entity._changed(this._world, this._index, {required this.components});
+  Entity._changed(this._world, {required this.components});
+
+  void despawn() {
+    _world._entities.remove(this);
+  }
 
   Entity addComponent<T extends Object>(T component) {
     final nextEntity = _replaceComponent(component);
@@ -126,8 +130,8 @@ class Entity {
 
     _world._componentTypes.add(T);
 
-    return _world._entities[_index] =
-        Entity._changed(_world, _index, components: [...components, component]);
+    return _world._entities[_world._entities.indexOf(this)] =
+        Entity._changed(_world, components: [...components, component]);
   }
 
   Entity removeComponent<T extends Object>(T component) {
@@ -135,16 +139,17 @@ class Entity {
       return this;
     }
 
-    return _world._entities[_index] = Entity._changed(_world, _index,
-        components: components..remove(component));
+    return _world._entities[_world._entities.indexOf(this)] =
+        Entity._changed(_world, components: components..remove(component));
   }
 
   Entity _replaceComponent<T extends Object>(T component) {
     if (components.map((it) => it.runtimeType).contains(T)) {
-      return _world._entities[_index] = Entity._changed(_world, _index,
-          components: components
-            ..removeWhere((it) => it.runtimeType == T)
-            ..add(component));
+      return _world._entities[_world._entities.indexOf(this)] =
+          Entity._changed(_world,
+              components: components
+                ..removeWhere((it) => it.runtimeType == T)
+                ..add(component));
     }
 
     return this;

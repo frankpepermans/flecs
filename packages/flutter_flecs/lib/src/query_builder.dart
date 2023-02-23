@@ -1,7 +1,7 @@
 import 'package:flecs/flecs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_flecs/src/flecs.dart';
+import 'package:flutter_flecs/flutter_flecs.dart';
 
 typedef ChildBuilder<T> = Widget Function(T);
 
@@ -20,31 +20,23 @@ class QueryBuilder<T extends Record> extends StatefulWidget {
 }
 
 class _QueryBuilderState<T extends Record> extends State<QueryBuilder<T>> {
-  late final Context flecsContext;
-  late final SystemBuilder<T> builder;
-  Widget? child;
-
   @override
   void initState() {
-    flecsContext = Flecs.of(context).flecsContext;
-    builder = (context) => System(widget.select, handler: (data) {
-          setState(() {
-            child = widget.builder(data);
-          });
-        });
+    context.flecs.world.addSystem(_builder);
 
     super.initState();
-
-    flecsContext.world.addSystem(builder);
   }
 
   @override
   void dispose() {
-    super.dispose();
+    context.flecs.world.removeSystem(_builder);
 
-    flecsContext.world.removeSystem(builder);
+    super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => child ?? Container();
+  Widget build(BuildContext context) => widget.builder(widget.select);
+
+  System<T> _builder(Context context) =>
+      System(widget.select, handler: (_) => setState(() {}));
 }
