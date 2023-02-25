@@ -69,13 +69,81 @@ class Query<T extends Record> {
               yield (components[0], components[1], components[2]) as T;
               break;
             case 4:
-              yield (components[0], components[1], components[2], components[3]) as T;
+              yield (
+                components[0],
+                components[1],
+                components[2],
+                components[3]
+              ) as T;
               break;
             case 5:
-              yield (components[0], components[1], components[2], components[3], components[4]) as T;
+              yield (
+                components[0],
+                components[1],
+                components[2],
+                components[3],
+                components[4]
+              ) as T;
               break;
             case 6:
-              yield (components[0], components[1], components[2], components[3], components[4], components[5]) as T;
+              yield (
+                components[0],
+                components[1],
+                components[2],
+                components[3],
+                components[4],
+                components[5]
+              ) as T;
+              break;
+            case 7:
+              yield (
+                components[0],
+                components[1],
+                components[2],
+                components[3],
+                components[4],
+                components[5],
+                components[6]
+              ) as T;
+              break;
+            case 8:
+              yield (
+                components[0],
+                components[1],
+                components[2],
+                components[3],
+                components[4],
+                components[5],
+                components[6],
+                components[7]
+              ) as T;
+              break;
+            case 9:
+              yield (
+                components[0],
+                components[1],
+                components[2],
+                components[3],
+                components[4],
+                components[5],
+                components[6],
+                components[7],
+                components[8]
+              ) as T;
+              break;
+            case 10:
+              yield (
+                components[0],
+                components[1],
+                components[2],
+                components[3],
+                components[4],
+                components[5],
+                components[6],
+                components[7],
+                components[8],
+                components[9]
+              ) as T;
               break;
           }
         } catch (_) {
