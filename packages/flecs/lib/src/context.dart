@@ -9,5 +9,5 @@ class Context {
   }
 
   factory Context({Stream? scheduler}) => Context._(scheduler ??
-      Stream.periodic(const Duration(milliseconds: 0)).asBroadcastStream());
+      Stream.periodic(const Duration(milliseconds: 20)).asBroadcastStream());
 }

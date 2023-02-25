@@ -15,7 +15,7 @@ part 'core/world.dart';
 
 enum _SchedulerPhase { start, end }
 
-typedef _Combiner = Iterable<List<Type>> Function(Type it, List<Type> data);
+typedef _Combiner = Iterable<List<Type>> Function(Type type, List<Type> data);
 
 class _QueryTransaction {
   final Set<Type> componentTypes;
