@@ -9,9 +9,9 @@ class Query<T extends Record> {
 
   @mustCallSuper
   Iterable<T> iter() {
-    final querySession = context.world._createQuerySession();
-    final data = [Entity, ...querySession.componentTypes];
-    final test = _test(querySession);
+    final transaction = context.world._createQueryTransaction();
+    final data = [Entity, ...transaction.componentTypes];
+    final test = _test(transaction);
 
     combineAll() =>
         _combineAll(
@@ -27,16 +27,16 @@ class Query<T extends Record> {
         const [];
 
     return _collect(
-        querySession,
+        transaction,
         _resolvedTypes.putIfAbsent(T,
             () => data.map((it) => [it]).firstWhere(test, orElse: combineAll)));
   }
 
-  bool Function(List<Type>) _test(WorldQuerySession querySession) =>
+  bool Function(List<Type>) _test(QueryTransaction transaction) =>
       (List<Type> list) {
         //print(list);
         try {
-          return _collect(querySession, list).firstOrNull is T;
+          return _collect(transaction, list).firstOrNull is T;
         } catch (_) {
           //
         }
@@ -52,8 +52,8 @@ class Query<T extends Record> {
         .expand((it) => it));
   }
 
-  Iterable<T> _collect(WorldQuerySession querySession, List<Type> types) sync* {
-    for (final it in querySession.entities) {
+  Iterable<T> _collect(QueryTransaction transaction, List<Type> types) sync* {
+    for (final it in transaction.entities) {
       final components = it._componentsFromTypes(types);
 
       if (components.length == types.length) {

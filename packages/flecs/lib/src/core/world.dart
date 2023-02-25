@@ -94,7 +94,7 @@ class World {
   @mustCallSuper
   void addEvent(Event event) => _events.add(event);
 
-  WorldQuerySession _createQuerySession() => WorldQuerySession(
+  QueryTransaction _createQueryTransaction() => QueryTransaction(
     componentTypes: Set.unmodifiable(_componentTypes),
     entities: List.unmodifiable(_entities),
   );

@@ -17,11 +17,11 @@ enum SchedulerPhase { start, end }
 
 typedef Combiner = Iterable<List<Type>> Function(Type it, List<Type> data);
 
-class WorldQuerySession {
+class QueryTransaction {
   final Set<Type> componentTypes;
   final List<Entity> entities;
 
-  WorldQuerySession({
+  QueryTransaction({
     required this.entities,
     required this.componentTypes,
   });
