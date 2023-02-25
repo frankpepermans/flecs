@@ -4,5 +4,6 @@ final initSystem = SystemProvider.builder((context) =>
   System.normal(() {
     context.world.spawn().addComponent(1);
     context.world.spawn().addComponent(2);
-    context.world.spawn().addComponent(3);
+    context.world.spawn().addComponent(3).addComponent(true);
+    context.world.spawn().addComponent('test').addComponent(4);
   }));

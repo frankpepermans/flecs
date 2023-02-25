@@ -1,5 +1,4 @@
-import 'package:flecs/src/events.dart';
-import 'package:flecs/src/world.dart';
+import 'package:flecs/src/core.dart';
 
 import 'components.dart';
 

@@ -1,9 +1,6 @@
 import 'package:flecs/src/context.dart';
-import 'package:flecs/src/events.dart';
-import 'package:flecs/src/query.dart';
-import 'package:flecs/src/resource.dart';
 import 'package:flecs/src/system.dart';
-import 'package:flecs/src/world.dart';
+import 'package:flecs/src/core.dart';
 
 import 'components.dart';
 import 'events.dart';

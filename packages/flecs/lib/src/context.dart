@@ -1,4 +1,4 @@
-import 'package:flecs/src/world.dart';
+import 'package:flecs/src/core.dart';
 
 class Context {
   late final World world;
