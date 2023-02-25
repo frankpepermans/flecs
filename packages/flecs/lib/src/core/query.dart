@@ -32,7 +32,7 @@ class Query<T extends Record> {
             () => data.map((it) => [it]).firstWhere(test, orElse: combineAll)));
   }
 
-  bool Function(List<Type>) _test(QueryTransaction transaction) =>
+  bool Function(List<Type>) _test(_QueryTransaction transaction) =>
       (List<Type> list) {
         //print(list);
         try {
@@ -44,7 +44,7 @@ class Query<T extends Record> {
         return false;
       };
 
-  Iterable<Combiner> _combineAll(Combiner f) sync* {
+  Iterable<_Combiner> _combineAll(_Combiner f) sync* {
     yield f;
     yield* _combineAll((Type it, List<Type> data) => f(it, data)
         .map((tuple) =>
@@ -52,7 +52,7 @@ class Query<T extends Record> {
         .expand((it) => it));
   }
 
-  Iterable<T> _collect(QueryTransaction transaction, List<Type> types) sync* {
+  Iterable<T> _collect(_QueryTransaction transaction, List<Type> types) sync* {
     for (final it in transaction.entities) {
       final components = it._componentsFromTypes(types);
 

@@ -13,15 +13,15 @@ part 'core/query.dart';
 part 'core/resource.dart';
 part 'core/world.dart';
 
-enum SchedulerPhase { start, end }
+enum _SchedulerPhase { start, end }
 
-typedef Combiner = Iterable<List<Type>> Function(Type it, List<Type> data);
+typedef _Combiner = Iterable<List<Type>> Function(Type it, List<Type> data);
 
-class QueryTransaction {
+class _QueryTransaction {
   final Set<Type> componentTypes;
   final List<Entity> entities;
 
-  QueryTransaction({
+  _QueryTransaction({
     required this.entities,
     required this.componentTypes,
   });

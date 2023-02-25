@@ -6,20 +6,20 @@ class World {
   final List<Entity> _entities = <Entity>[];
   final ScheduledList<Event> _events = ScheduledList<Event>();
   final List<Object> _resources = <Object>[];
-  late final StreamSubscription<SchedulerPhase> _schedulerEndListener;
+  late final StreamSubscription<_SchedulerPhase> _schedulerEndListener;
   final List<_SystemRunner<Record>> _runners = <_SystemRunner<Record>>[];
-  late final Stream<SchedulerPhase> _schedulerStart =
-      _scheduler.where((it) => it == SchedulerPhase.start);
-  late final Stream<SchedulerPhase> _schedulerEnd =
-      _scheduler.where((it) => it == SchedulerPhase.end);
-  final Stream<SchedulerPhase> _scheduler;
+  late final Stream<_SchedulerPhase> _schedulerStart =
+      _scheduler.where((it) => it == _SchedulerPhase.start);
+  late final Stream<_SchedulerPhase> _schedulerEnd =
+      _scheduler.where((it) => it == _SchedulerPhase.end);
+  final Stream<_SchedulerPhase> _scheduler;
 
   int get entitiesHashCode =>
       hashObjects(_entities.map((it) => it._componentsHashCode));
 
   World(this.context, {required Stream scheduler})
       : _scheduler = scheduler
-            .map((_) => [SchedulerPhase.start, SchedulerPhase.end])
+            .map((_) => [_SchedulerPhase.start, _SchedulerPhase.end])
             .expand((it) => it) {
     _schedulerEndListener = _schedulerEnd.listen((_) => _events.update());
   }
@@ -94,7 +94,7 @@ class World {
   @mustCallSuper
   void addEvent(Event event) => _events.add(event);
 
-  QueryTransaction _createQueryTransaction() => QueryTransaction(
+  _QueryTransaction _createQueryTransaction() => _QueryTransaction(
     componentTypes: Set.unmodifiable(_componentTypes),
     entities: List.unmodifiable(_entities),
   );
@@ -110,7 +110,7 @@ class World {
 
 class _SystemRunner<T extends Record> {
   final SystemBuilder<T> builder;
-  final StreamSubscription<SchedulerPhase> subscription;
+  final StreamSubscription<_SchedulerPhase> subscription;
 
   _SystemRunner(this.builder, this.subscription);
 }
