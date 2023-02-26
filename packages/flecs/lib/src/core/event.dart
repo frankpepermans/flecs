@@ -7,18 +7,14 @@ abstract class Event {
 }
 
 class EventReader<T extends Event> {
-  final Context context;
+  const EventReader();
 
-  const EventReader(this.context);
-
-  Iterable<T> iter() =>
+  Iterable<T> iter(Context context) =>
       List.unmodifiable(context.world._events.snapshot.whereType<T>());
 }
 
 class EventWriter<T extends Event> {
-  final Context context;
+  const EventWriter();
 
-  const EventWriter(this.context);
-
-  void send(T event) => context.world.addEvent(event);
+  void send(Context context, T event) => context.world.addEvent(event);
 }

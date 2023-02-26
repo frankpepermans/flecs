@@ -14,14 +14,20 @@ class World {
       _scheduler.where((it) => it == _SchedulerPhase.end);
   final Stream<_SchedulerPhase> _scheduler;
 
-  int get entitiesHashCode =>
+  int get _entitiesHashCode =>
       hashObjects(_entities.map((it) => it._componentsHashCode));
 
   World(this.context, {required Stream scheduler})
       : _scheduler = scheduler
             .map((_) => [_SchedulerPhase.start, _SchedulerPhase.end])
             .expand((it) => it) {
-    _schedulerEndListener = _schedulerEnd.listen((_) => _events.update());
+    _schedulerEndListener = _schedulerEnd.listen((_) {
+      _events.update();
+
+      for (final entity in _entities) {
+        entity._clearDelta();
+      }
+    });
   }
 
   @mustCallSuper
@@ -68,7 +74,7 @@ class World {
     var hc = -1;
     final runner =
         _SystemRunner(systemBuilder, _schedulerStart.listen((_) async {
-      var hcNow = entitiesHashCode;
+      var hcNow = _entitiesHashCode;
 
       if (hc != hcNow || _events.hasUpdate) {
         hc = hcNow;

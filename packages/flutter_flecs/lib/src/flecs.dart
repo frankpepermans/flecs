@@ -71,9 +71,3 @@ class FlecsState extends State<Flecs> {
   @override
   Widget build(BuildContext context) => widget.child;
 }
-
-abstract class FlecsSetup {
-  List<Object> get resources;
-  List<SystemBuilder> get startupSystems;
-  List<SystemBuilder> get systems;
-}

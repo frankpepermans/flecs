@@ -1,14 +1,33 @@
 part of core;
 
+typedef QueryFilter<T extends Record> = bool Function(T row);
+typedef EntityFilter<T> = bool Function(Entity entity);
+
 class Query<T extends Record> {
   static final _resolvedTypes = <Type, List<Type>>{};
+  final List<QueryFilter<T>> _filters;
+  final List<EntityFilter<T>> _entityFilters;
 
-  final Context context;
+  const Query()
+      : _filters = const [],
+        _entityFilters = const [];
 
-  const Query(this.context);
+  Query._withFilters(
+      List<QueryFilter<T>> filters, List<EntityFilter<T>> entityFilters)
+      : _filters = filters,
+        _entityFilters = entityFilters;
+
+  Query<T> where(QueryFilter<T> filter) =>
+      Query._withFilters([..._filters, filter], _entityFilters);
+
+  Query<T> including<F>() => Query._withFilters(_filters,
+      [..._entityFilters, (Entity it) => it._components.containsKey(F)]);
+
+  Query<T> excluding<F>() => Query._withFilters(_filters,
+      [..._entityFilters, (Entity it) => !it._components.containsKey(F)]);
 
   @mustCallSuper
-  Iterable<T> iter() {
+  Iterable<T> iter(Context context) {
     final transaction = context.world._createQueryTransaction();
     final data = [Entity, ...transaction.componentTypes];
     final test = _test(transaction);
@@ -27,9 +46,13 @@ class Query<T extends Record> {
         const [];
 
     return _collect(
-        transaction,
-        _resolvedTypes.putIfAbsent(T,
-            () => data.map((it) => [it]).firstWhere(test, orElse: combineAll)));
+            transaction,
+            _resolvedTypes.putIfAbsent(
+                T,
+                () => data
+                    .map((it) => [it])
+                    .firstWhere(test, orElse: combineAll)))
+        .where((it) => _filters.every((filter) => filter(it)));
   }
 
   bool Function(List<Type>) _test(_QueryTransaction transaction) =>
@@ -54,7 +77,7 @@ class Query<T extends Record> {
 
   Iterable<T> _collect(_QueryTransaction transaction, List<Type> types) sync* {
     for (final it in transaction.entities) {
-      final components = it._componentsFromTypes(types);
+      final components = it._componentsFromTypes(types, _entityFilters);
 
       if (components.length == types.length) {
         try {
@@ -70,79 +93,79 @@ class Query<T extends Record> {
               break;
             case 4:
               yield (
-                components[0],
-                components[1],
-                components[2],
-                components[3]
+              components[0],
+              components[1],
+              components[2],
+              components[3]
               ) as T;
               break;
             case 5:
               yield (
-                components[0],
-                components[1],
-                components[2],
-                components[3],
-                components[4]
+              components[0],
+              components[1],
+              components[2],
+              components[3],
+              components[4]
               ) as T;
               break;
             case 6:
               yield (
-                components[0],
-                components[1],
-                components[2],
-                components[3],
-                components[4],
-                components[5]
+              components[0],
+              components[1],
+              components[2],
+              components[3],
+              components[4],
+              components[5]
               ) as T;
               break;
             case 7:
               yield (
-                components[0],
-                components[1],
-                components[2],
-                components[3],
-                components[4],
-                components[5],
-                components[6]
+              components[0],
+              components[1],
+              components[2],
+              components[3],
+              components[4],
+              components[5],
+              components[6]
               ) as T;
               break;
             case 8:
               yield (
-                components[0],
-                components[1],
-                components[2],
-                components[3],
-                components[4],
-                components[5],
-                components[6],
-                components[7]
+              components[0],
+              components[1],
+              components[2],
+              components[3],
+              components[4],
+              components[5],
+              components[6],
+              components[7]
               ) as T;
               break;
             case 9:
               yield (
-                components[0],
-                components[1],
-                components[2],
-                components[3],
-                components[4],
-                components[5],
-                components[6],
-                components[7],
-                components[8]
+              components[0],
+              components[1],
+              components[2],
+              components[3],
+              components[4],
+              components[5],
+              components[6],
+              components[7],
+              components[8]
               ) as T;
               break;
             case 10:
               yield (
-                components[0],
-                components[1],
-                components[2],
-                components[3],
-                components[4],
-                components[5],
-                components[6],
-                components[7],
-                components[8],
-                components[9]
+              components[0],
+              components[1],
+              components[2],
+              components[3],
+              components[4],
+              components[5],
+              components[6],
+              components[7],
+              components[8],
+              components[9]
               ) as T;
               break;
           }

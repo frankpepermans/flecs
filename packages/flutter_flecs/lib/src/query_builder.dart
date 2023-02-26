@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_flecs/flutter_flecs.dart';
 
-typedef ChildBuilder<T> = Widget Function(T);
+typedef ChildBuilder<T> = Widget Function(Context flecs, T data);
 
 class QueryBuilder<T extends Record> extends StatefulWidget {
   final T select;
@@ -35,7 +35,8 @@ class _QueryBuilderState<T extends Record> extends State<QueryBuilder<T>> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.builder(widget.select);
+  Widget build(BuildContext context) =>
+      widget.builder(context.flecs, widget.select);
 
   System<T> _builder(Context context) =>
       System(widget.select, handler: (_) => setState(() {}));

@@ -1,11 +1,9 @@
 part of core;
 
 class Resource<T extends Object> {
-  final Context context;
+  const Resource();
 
-  const Resource(this.context);
-
-  T get resource => context.world._fetchResource();
+  T value(Context context) => context.world._fetchResource();
 }
 
 class ResourceNotFoundError<T extends Object> extends Error {

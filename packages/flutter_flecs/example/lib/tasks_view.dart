@@ -9,13 +9,14 @@ class TasksView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => QueryBuilder(
         select: (
-          Query<(int, Entity)>(context.flecs),
-          EventWriter<IntUpdater>(context.flecs),
+          const Query<(int, Entity)>().excluding<String>(),
+          const EventWriter<IntUpdater>(),
+          const Resource<String>(),
         ),
-        builder: (data) {
+        builder: (flecs, data) {
           final query = data.$1;
           final eventWriter = data.$2;
-          final iter = query.iter().toList(growable: false);
+          final iter = query.iter(flecs).toList(growable: false);
 
           return Padding(
             padding: const EdgeInsets.all(24.0),
@@ -30,7 +31,10 @@ class TasksView extends StatelessWidget {
                   Text('task $value'),
                   ElevatedButton(
                     onPressed: () =>
-                        eventWriter.send(IntUpdater(entity, value + 1)),
+                        eventWriter.send(
+                            context.flecs,
+                            IntUpdater(entity, value + 1),
+                        ),
                     child: const Text('add 1!'),
                   ),
                 ],
