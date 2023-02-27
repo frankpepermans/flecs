@@ -1,5 +1,5 @@
 import 'package:flecs/src/context.dart';
-import 'package:flecs/src/system.dart';
+import 'package:flecs/src/core/system.dart';
 import 'package:flecs/src/core.dart';
 
 import 'components.dart';

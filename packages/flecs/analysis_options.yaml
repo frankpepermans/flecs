@@ -5,3 +5,10 @@ analyzer:
     - records
     - sealed-class
     - patterns
+
+linter:
+  rules:
+    - public_member_api_docs
+    - always_declare_return_types
+    - prefer_single_quotes
+    - unawaited_futures

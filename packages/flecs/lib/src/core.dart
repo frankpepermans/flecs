@@ -11,9 +11,11 @@ part 'core/entity.dart';
 part 'core/event.dart';
 part 'core/query.dart';
 part 'core/resource.dart';
+part 'core/scheduled_list.dart';
+part 'core/system.dart';
 part 'core/world.dart';
 
-enum _SchedulerPhase { start, end }
+enum _SchedulerPhase { pre, start, end }
 
 typedef _Combiner = Iterable<List<Type>> Function(Type type, List<Type> data);
 

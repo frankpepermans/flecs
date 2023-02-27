@@ -1,5 +1,14 @@
 part of core;
 
+/// An [Entity] represents an entry point for data within a [World].
+/// It's actual value is represented in components.
+///
+/// ```dart
+/// final entity = context.world.spawn()
+///   .addComponent(const Name('MyProduct'))
+///   .addComponent(const Price(99.90))
+///   .addComponent(const IsInStock(true));
+/// ```
 class Entity {
   final World _world;
   Map<Type, Object> _components = const <Type, Object>{};
@@ -11,9 +20,19 @@ class Entity {
 
   Entity._(this._world);
 
+  /// Removes the [Entity] from its [World].
   @mustCallSuper
   void despawn() => _world._entities.remove(this);
 
+  /// Adds a new component of type [T] to this [Entity].
+  /// If a component [T] was added before, then the existing component will
+  /// be replaced.
+  ///
+  /// ```dart
+  /// final entity = context.world.spawn()
+  ///   .addComponent(const Name('foo'))
+  ///   .addComponent(const Name('bar')); // entity now contains 1 component, Name('bar')
+  /// ```
   @mustCallSuper
   Entity addComponent<T extends Object>(T component) {
     final componentsHashCode = _componentsHashCode;
@@ -31,8 +50,15 @@ class Entity {
     return this;
   }
 
+  /// Removes a component of type [T].
+  ///
+  /// ```dart
+  /// final entity = context.world.spawn()
+  ///   .addComponent(const Name('foo'))
+  ///   .removeComponent<Name>(); // entity has no components
+  /// ```
   @mustCallSuper
-  Entity removeComponent<T extends Object>(T component) {
+  Entity removeComponent<T extends Object>() {
     if (!_components.containsKey(T)) {
       return this;
     }
@@ -57,7 +83,7 @@ class Entity {
   }
 
   List<Object> _componentsFromTypes(
-          List<Type> types, List<EntityFilter> entityFilters) =>
+          List<Type> types, List<_EntityFilter> entityFilters) =>
       types
           .map((type) => identical(runtimeType, type)
               ? entityFilters.every((filter) => filter(this))

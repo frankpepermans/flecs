@@ -20,27 +20,30 @@ class TasksView extends StatelessWidget {
 
           return Padding(
             padding: const EdgeInsets.all(24.0),
-            child: ListView.builder(itemBuilder: (context, index) {
-              final entry = iter[index];
-              final value = entry.$1;
-              final entity = entry.$2;
+            child: Column(children: [
+              Text(data.$3.value(flecs)),
+              Expanded(child: ListView.builder(itemBuilder: (context, index) {
+                final entry = iter[index];
+                final value = entry.$1;
+                final entity = entry.$2;
 
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('task $value'),
-                  ElevatedButton(
-                    onPressed: () =>
-                        eventWriter.send(
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('task $value'),
+                    ElevatedButton(
+                      onPressed: () =>
+                          eventWriter.send(
                             context.flecs,
                             IntUpdater(entity, value + 1),
-                        ),
-                    child: const Text('add 1!'),
-                  ),
-                ],
-              );
-            },
-            itemCount: iter.length,
-          ),);
+                          ),
+                      child: const Text('add 1!'),
+                    ),
+                  ],
+                );
+              },
+                itemCount: iter.length,
+              )),
+            ],),);
         });
 }

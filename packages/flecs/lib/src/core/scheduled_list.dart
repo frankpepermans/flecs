@@ -1,4 +1,6 @@
-class ScheduledList<T> {
+part of core;
+
+class _ScheduledList<T> {
   final List<T> _buffer = <T>[];
   List<T> _snapshot = const [];
   bool _hasUpdate = false;
