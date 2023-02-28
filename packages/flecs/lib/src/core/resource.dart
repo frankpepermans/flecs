@@ -7,6 +7,10 @@ part of core;
 ///
 /// class Config {
 ///   // properties
+///   final int foo;
+///   final String bar;
+///
+///   const Config({required this.foo, required this.bar});
 /// }
 /// ```
 class Resource<T extends Object> {

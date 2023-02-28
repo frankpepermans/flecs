@@ -10,9 +10,12 @@ class _ScheduledList<T> {
   bool get hasUpdate => _hasUpdate;
 
   void update() {
-    _snapshot = List.unmodifiable(_buffer);
     _hasUpdate = _buffer.isNotEmpty;
-    _buffer.clear();
+    _snapshot = _hasUpdate ? List.unmodifiable(_buffer) : const [];
+
+    if (_hasUpdate) {
+      _buffer.clear();
+    }
   }
 
   void add(T entry) => _buffer.add(entry);

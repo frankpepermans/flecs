@@ -27,13 +27,14 @@ abstract class SystemProvider {
 /// A [System] should not be created directly, always use [SystemBuilder.builder] instead.
 ///
 /// ```dart
-/// final someSystem = System((
-///   const EventReader<PriceUpdate>(),
-///   const Resource<Config>(),
-///   const Query<(Entity, Price)>()
-/// ), handler: (data) {
-///   // ...
-/// });
+/// final someSystem = SystemProvider.builder((context) =>
+///   System((
+///     const EventReader<PriceUpdate>(),
+///     const Resource<Config>(),
+///     const Query<(Entity, Price)>()
+///   ), handler: (data) {
+///     // ...
+///   }));
 /// ```
 class System<T extends Record> {
   /// Parameters which are passed as argument to [handler].

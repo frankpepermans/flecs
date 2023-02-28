@@ -7,7 +7,7 @@ part of core;
 ///   final int foo;
 ///   final String bar;
 ///
-///   const MyEvent({this.foo, this.bar});
+///   const MyEvent({required this.foo, required this.bar});
 /// }
 /// ```
 abstract class Event {
@@ -20,6 +20,15 @@ abstract class Event {
 
 /// An event reader can be included in a [System] and will trigger whenever
 /// an equivalent [EventWriter] of type [T] sent a new [Event].
+///
+/// ```dart
+/// final updateSystem = SystemProvider.builder((context) =>
+///   System((const EventReader<PriceUpdate>(),), handler: (data) {
+///     for (final it in data.$1.iter(context)) {
+///       it.entity.addComponent(Price(it.value));
+///     }
+///   }));
+/// ```
 class EventReader<T extends Event> {
   /// Creates a new [EventReader].
   const EventReader();
@@ -31,6 +40,20 @@ class EventReader<T extends Event> {
 
 /// An event reader can be included in a [System] and can be used to send an [Event] to another [System] which
 /// makes use of [EventReader] of type [T].
+///
+/// ```dart
+/// final updateSystem = SystemProvider.builder((context) =>
+///   System((
+///     const Query<(Entity, Price)>(),
+///     const EventReader<PriceUpdate>(),
+///   ), handler: (data) {
+///     for (final (entity, price) in data.$1.iter(context)) {
+///       if (price.value < 100.0) {
+///         data.$2.send(context, const PriceUpdate(100.0));
+///       }
+///     }
+///   }));
+/// ```
 class EventWriter<T extends Event> {
   /// Creates a new [EventWriter].
   const EventWriter();
