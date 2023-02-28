@@ -17,7 +17,7 @@ jobs:
           sdk: dev
 
       - name: Install dependencies
-        run: dart pub get
+        run: cd flecs & dart pub get
 
       #- name: Verify formatting
       #  run: dart --enable-experiment=records format --output=none --set-exit-if-changed .
