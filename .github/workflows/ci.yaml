@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,9 +15,6 @@ jobs:
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: dev
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Install dependencies
         run: dart pub get
