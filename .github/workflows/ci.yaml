@@ -17,13 +17,16 @@ jobs:
           sdk: dev
 
       - name: Install dependencies
-        run: cd packages/flecs & dart pub get
+        working-directory: ./packages/flecs
+        run: dart pub get
 
       #- name: Verify formatting
       #  run: dart --enable-experiment=records format --output=none --set-exit-if-changed .
 
       - name: Analyze project source
+        working-directory: ./packages/flecs
         run: dart --enable-experiment=records analyze
 
       - name: Test
+        working-directory: ./packages/flecs
         run: dart --enable-experiment=records test
