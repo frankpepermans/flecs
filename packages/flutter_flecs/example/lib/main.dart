@@ -1,7 +1,6 @@
 import 'package:example/systems/init_system.dart';
 import 'package:example/systems/update_system.dart';
 import 'package:example/tasks_view.dart';
-import 'package:flecs/flecs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flecs/flutter_flecs.dart';
 
