@@ -5,7 +5,7 @@ import 'components.dart';
 import 'events.dart';
 import 'repositories.dart';
 
-final updateSystem = (Context context) => System((
+final updateSystem = SystemProvider.builder((Context context) => System((
     const EventReader<ChangeNameEvent>(),
     const EventReader<SpawnEntityEvent>(),
     const Resource<TaskRepository>(),
@@ -23,22 +23,22 @@ final updateSystem = (Context context) => System((
           .addComponent(const Owner(Name('Ayden')))
           .addComponent(const Location(Name('park')));
     }
-  });
+  }));
 
-final renderSystem = (Context context) => System((
+final renderSystem = SystemProvider.builder((Context context) => System((
     Query<(TaskDuration, Name, Location, Owner, Entity)>(),
     Query<(Name, TaskDuration, Location)>(),
     EventWriter<ChangeNameEvent>(),
     EventWriter<SpawnEntityEvent>(),
   ), handler: (data) {
     print('Query<(TaskDuration, Name, Location, Owner, Entity)>: ');
-    for (final (duration, name, location, owner, entity) in data.$1.iter(context)) {
-      print(' hi $owner, please take care of "$name" in the $location, it should not take more than $duration seconds');
+    for (final row in data.$1.iter(context)) {
+      print(' hi ${row.$4}, please take care of "${row.$2}" in the ${row.$3}, it should not take more than ${row.$1} seconds');
 
-      if (name.value == 'washing the dishes') {
-        final (changeNameWriter, spawnEntityWriter) = (data.$3, data.$4);
-        changeNameWriter.send(ChangeNameEvent(entity, prevName: name, nextName: const Name('mowing the lawn')));
-        spawnEntityWriter.send(SpawnEntityEvent(entity));
+      if (row.$2.value == 'washing the dishes') {
+        final writers = (data.$3, data.$4);
+        writers.$1.send(context, ChangeNameEvent(row.$5, prevName: row.$2, nextName: const Name('mowing the lawn')));
+        writers.$2.send(context, SpawnEntityEvent(row.$5));
       }
     }
 
@@ -47,7 +47,7 @@ final renderSystem = (Context context) => System((
           }*/
 
     print('Query<(Name, TaskDuration, Location)>: ');
-    for (final (name, duration, location) in data.$2.iter(context)) {
-      print(' could anyone please take care of "$name" in the $location, it should not take more than $duration seconds');
+    for (final row in data.$2.iter(context)) {
+      print(' could anyone please take care of "${row.$1}" in the ${row.$3}, it should not take more than ${row.$2} seconds');
     }
-  });
+  }));
