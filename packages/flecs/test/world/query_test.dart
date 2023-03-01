@@ -65,5 +65,14 @@ void main() {
       expect(query.iter(context).length, 1);
       expect(query.iter(context).map((it) => it.$1).contains(2), isTrue);
     });
+
+    test('- respects Type order', () async {
+      final queryA = Query<(int, bool, Entity)>();
+      final queryB = Query<(Entity, int, bool)>();
+      final entity = context.world.spawn()..addComponent(1)..addComponent(true);
+
+      expect(queryA.iter(context).first, (1, true, entity));
+      expect(queryB.iter(context).first, (entity, 1, true));
+    });
   });
 }

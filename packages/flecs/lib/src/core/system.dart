@@ -1,7 +1,7 @@
 part of core;
 
 /// Describes the handler which is used to add systems to a [World].
-typedef SystemBuilder<T extends Record> = System<T> Function(Context);
+typedef SystemBuilder<T extends Record> = System<T> Function(Context context);
 
 /// A [SystemProvider] prepares a [System] builder which accepts [Context] and returns a [System].
 ///
