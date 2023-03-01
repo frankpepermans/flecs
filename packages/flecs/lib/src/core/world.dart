@@ -2,8 +2,7 @@ part of core;
 
 /// A [World] is a collection of all data that can be requested.
 class World {
-  /// The [Context] to which this [World] belongs to.
-  final Context context;
+  final Context _context;
   final Set<Type> _componentTypes = <Type>{};
   final List<Entity> _entities = <Entity>[];
   final _ScheduledList<Event> _events = _ScheduledList<Event>();
@@ -22,8 +21,8 @@ class World {
       hashObjects(_entities.map((it) => it._componentsHashCode));
 
   /// Creates a new [World] within the referenced [Context].
-  World(this.context)
-      : _scheduler = context.scheduler
+  World(this._context)
+      : _scheduler = _context.scheduler
             .map((_) => [
                   _SchedulerPhase.pre,
                   _SchedulerPhase.start,
@@ -105,7 +104,7 @@ class World {
   void addStartupSystem<T extends Record>(
       SystemBuilder<T> systemBuilder) async {
     await _schedulerPre.first;
-    await systemBuilder(context)._run();
+    await systemBuilder(_context)._run();
   }
 
   /// Adds a system which runs on every loop iteration.
@@ -115,7 +114,7 @@ class World {
       return;
     }
 
-    final system = systemBuilder(context);
+    final system = systemBuilder(_context);
     var hc = 0;
     final runner =
         _SystemRunner(systemBuilder, _schedulerStart.listen((_) async {
