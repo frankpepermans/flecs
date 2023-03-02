@@ -107,29 +107,29 @@ void main() {
 
   // query some data
   final demoSystem = SystemProvider.builder((context) => System((
-  const Query<(EventName, Location)>(),
-  const Query<(Entity, EventName)>().excluding<Location>(),
-  const EventWriter<MissingLocationEvent>(),
+      const Query<(EventName, Location)>(),
+      const Query<(Entity, EventName)>().excluding<Location>(),
+      const EventWriter<MissingLocationEvent>(),
   ), handler: ((queryA, queryB, eventWriter)) {
-  for (final (eventName, location) in queryA.iter(context)) {
-  print('Event ${eventName.value} planned at ${location.value}!');
-  }
+    for (final (eventName, location) in queryA.iter(context)) {
+      print('Event ${eventName.value} planned at ${location.value}!');
+    }
 
-  for (final (entity, eventName,) in queryB.iter(context)) {
-  print('Event ${eventName.value} has no location...');
-  // send an event which notifies about a missing Location
-  eventWriter.send(context, MissingLocationEvent(entity));
-  }
+    for (final (entity, eventName,) in queryB.iter(context)) {
+      print('Event ${eventName.value} has no location...');
+      // send an event which notifies about a missing Location
+      eventWriter.send(context, MissingLocationEvent(entity));
+    }
   }));
 
   // update some data
   final updateSystem = SystemProvider.builder((context) => System((
-  const EventReader<MissingLocationEvent>(),
+    const EventReader<MissingLocationEvent>(),
   ), handler: ((eventReader,)) {
-  for (final event in eventReader.iter(context)) {
-  // receive an event which notifies about a missing Location
-  event.entity.addComponent(const Location('Unknown location'));
-  }
+      for (final event in eventReader.iter(context)) {
+        // receive an event which notifies about a missing Location
+        event.entity.addComponent(const Location('Unknown location'));
+      }
   }));
 
   context.world

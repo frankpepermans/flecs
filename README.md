@@ -1,4 +1,4 @@
-Flecs is an experimental library which aims to provide a similar API 
+Flecs is an experimental library which aims to provide a similar API
 as [bevy_ecs](https://docs.rs/bevy_ecs/latest/bevy_ecs/),
 which is an open-source Rust library for ECS (Entity Component System).
 
@@ -12,14 +12,14 @@ dart --enable-experiment=records ...
 
 ## What?
 
-Entity Component System (ECS) is a software architectural pattern mostly used in 
-video game development for the representation of game world objects. 
-An ECS comprises entities composed from components of data, 
+Entity Component System (ECS) is a software architectural pattern mostly used in
+video game development for the representation of game world objects.
+An ECS comprises entities composed from components of data,
 with systems which operate on entities' components.
 
-ECS follows the principle of composition over inheritance, 
-meaning that every entity is defined not by a type hierarchy, 
-but by the components that are associated with it. 
+ECS follows the principle of composition over inheritance,
+meaning that every entity is defined not by a type hierarchy,
+but by the components that are associated with it.
 Systems act globally over all entities which have the required components.
 
 ## How it works
@@ -112,7 +112,7 @@ void main() {
       const EventWriter<MissingLocationEvent>(),
   ), handler: ((queryA, queryB, eventWriter)) {
       for (final (eventName, location) in queryA.iter(context)) {
-        print('Event ${eventName.value} planned at ${location.value}!');
+          print('Event ${eventName.value} planned at ${location.value}!');
       }
     
       for (final (entity, eventName,) in queryB.iter(context)) {
@@ -121,14 +121,14 @@ void main() {
           eventWriter.send(context, MissingLocationEvent(entity));
       }
   }));
-    
+
   // update some data
   final updateSystem = SystemProvider.builder((context) => System((
     const EventReader<MissingLocationEvent>(),
   ), handler: ((eventReader,)) {
       for (final event in eventReader.iter(context)) {
-        // receive an event which notifies about a missing Location
-        event.entity.addComponent(const Location('Unknown location'));
+          // receive an event which notifies about a missing Location
+          event.entity.addComponent(const Location('Unknown location'));
       }
   }));
 
