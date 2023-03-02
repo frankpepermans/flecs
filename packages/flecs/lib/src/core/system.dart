@@ -53,7 +53,7 @@ class System<T extends Record> {
 
   /// Creates a [System] without requiring any parameters.
   /// Typically used with startup systems.
-  factory System.normal(void Function() handler) =>
+  factory System.noParams(void Function() handler) =>
       System((null,) as T, handler: (_) => handler());
 
   FutureOr<void> _run() => handler(params);
