@@ -2,6 +2,14 @@ Flecs is an experimental library which aims to provide a similar API
 as [bevy_ecs](https://docs.rs/bevy_ecs/latest/bevy_ecs/),
 which is an open-source Rust library for ECS (Entity Component System).
 
+It currently relies on an experimental Dart feature Records, so please make sure to have
+a dev channel SDK installed.
+
+You can then run code via:
+```
+dart --enable-experiment=records ...
+```
+
 ## What?
 
 Entity Component System (ECS) is a software architectural pattern mostly used in 
@@ -13,6 +21,47 @@ ECS follows the principle of composition over inheritance,
 meaning that every entity is defined not by a type hierarchy, 
 but by the components that are associated with it. 
 Systems act globally over all entities which have the required components.
+
+## How it works
+
+With an ECS, you have a `World`, which contains basically all the data related to the application.
+This world can contain both `Resources` and `Entities`:
+
+- A resource is typically a single entry, which is often referenced to within `Systems`.
+- An Entity is an entry point for Components, the combined components that are added to it, make up more complex data structures.
+
+For example:
+
+```dart
+final context = Context();
+
+// add a resource
+context.world.addResource(const Size(width: 100.0, height: 200.0));
+
+// add entities
+context.world.spawn() // creates a new Entity
+  ..addComponent(const Name('test')) // add components
+  ..addComponent(const Price(100.0));
+```
+
+Now that the world has data, we can start building `Systems`. Context contains a loop scheduler, on every
+loop instance, the world detects if any data has changed, and if that is the case, it then runs all systems
+that it was given.
+
+```dart
+final mySystem = SystemProvider.builder((context) => System((
+    const Resource<Size>(),
+    const Query<(Name, Price)>(),
+), handler: ((size, query)) {
+    print('size is ${size.width} - ${size.height}');
+    for (final (name, price) in query.iter(context)) {
+      print('Name ${name.value} costs ${price.value}');
+    }
+}));
+
+// add the system
+context.world.addSystem(mySystem);
+```
 
 ## Getting started
 
